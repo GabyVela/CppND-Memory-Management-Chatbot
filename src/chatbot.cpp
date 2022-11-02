@@ -64,7 +64,9 @@ ChatBot::ChatBot(ChatBot &&source) {
   // Assign data from source
   if (source._image != NULL) {
     this->_image = new wxBitmap(*source._image);
-  } else {
+  } 
+  else 
+  {
     this->_image = NULL;
   }
   this->_currentNode = source._currentNode;
