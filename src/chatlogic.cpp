@@ -18,10 +18,10 @@ ChatLogic::ChatLogic()
     
 
     // create instance of chatbot
-    //_chatBot = new ChatBot("../images/chatbot.png");
+    _chatBot = new ChatBot("../images/chatbot.png");
 
     // add pointer to chatlogic so that chatbot answers can be passed on to the GUI
-   // _chatBot->SetChatLogicHandle(this);
+    _chatBot->SetChatLogicHandle(this);
 
     
     //// EOF STUDENT CODE
@@ -166,17 +166,17 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename)
                             auto childNode = std::find_if(_nodes.begin(), _nodes.end(), [&childToken](std::unique_ptr<GraphNode>&node) { return node->GetID() == std::stoi(childToken->second); });
 
                             // create new edge
-                            GraphEdge *edge = new GraphEdge(id);
+                            auto edge = std::make_unique<GraphEdge>(id);
                             edge->SetChildNode((*childNode).get());
                             edge->SetParentNode((*parentNode).get());
-                            _edges.push_back(std::move(std::unique_ptr<GraphEdge>(edge)));
+                            _edges.push_back (edge.get());
 
                             // find all keywords for current node
                             AddAllTokensToElement("KEYWORD", tokens, *edge);
 
                             // store reference in child node and parent node
-                            (*childNode)->AddEdgeToParentNode(edge);
-                            (*parentNode)->AddEdgeToChildNode(edge);
+                            (*childNode)->AddEdgeToParentNode (edge.get());
+                            (*parentNode)->AddEdgeToChildNode(std::move(edge));
                         }
 
                         ////
@@ -215,15 +215,15 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename)
      
     }
 
-  /*ChatBot bot = ChatBot("../images/chatbot.png");
-   set _chatBot value for GUI communication
- SetChatbotHandle(_chatBot); // update _chatBot for chatLogic 
+   ChatBot chatBot = ChatBot("../images/chatbot.png");
+   //set _chatBot value for GUI communication
+   SetChatbotHandle(&chatBot); // update _chatBot for chatLogic 
 
-chatBot.SetChatLogicHandle(this); //chatbot answers passed to GUI
-  */
+   chatBot.SetChatLogicHandle(this); //chatbot answers passed to GUI
+  
     // add chatbot to graph root node
-    _chatBot->SetRootNode(rootNode);
-    rootNode->MoveChatbotHere(_chatBot);
+    chatBot.SetRootNode(rootNode);
+    rootNode->MoveChatbotHere(std::move(chatBot));
     
     ////
     //// EOF STUDENT CODE

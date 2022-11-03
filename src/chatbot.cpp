@@ -57,30 +57,44 @@ ChatBot::ChatBot(const ChatBot &source) {
   this->_chatLogic->SetChatbotHandle(this);  
 }
 
+ChatBot& ChatBot::operator=(const ChatBot &source) {
+  std::cout << "ChatBot Copy Assigment" << std::endl;
+  if (source._image != NULL) {
+    this->_image = new wxBitmap(*source._image);
+  } else {
+    this->_image = NULL;
+  }
+  this->_currentNode = source._currentNode;
+  this->_rootNode = source._rootNode;
+  this->_chatLogic = source._chatLogic;
+  this->_chatLogic->SetChatbotHandle(this);  
+  return *(this);
+}
+
+
 // move constructor
 ChatBot::ChatBot(ChatBot &&source) {
   std::cout << "ChatBot Move Constructor" << std::endl;
 
   // Assign data from source
   if (source._image != NULL) {
-    this->_image = new wxBitmap(*source._image);
+    this->_image = source._image;
+    source._image = NULL; // Remove owned values from source
   } 
   else 
   {
     this->_image = NULL;
   }
+  
   this->_currentNode = source._currentNode;
   this->_rootNode = source._rootNode;
   this->_chatLogic = source._chatLogic;
   this->_chatLogic->SetChatbotHandle(this);
-
-  // Remove owned values from source
-  source._image = NULL;
 }
 
 // move assignment operator
 ChatBot &ChatBot::operator=(ChatBot &&source) {
-  std::cout << "ChatBot Move Operator" << std::endl;
+  std::cout << "ChatBot Move Assigment Operator" << std::endl;
 
   // Check if source is the same as self
   if (this == &source) {
@@ -90,11 +104,15 @@ ChatBot &ChatBot::operator=(ChatBot &&source) {
   // Remove owned values
   if (this->_image != NULL) {
     delete this->_image;
+    
   }
 
   // Assign data from source
   if (source._image != NULL) {
-    this->_image = new wxBitmap(*source._image);
+    this->_image = source._image;
+    // Remove owned values from source
+    source._image = NULL;
+    
   } else {
     this->_image = NULL;
   }
@@ -102,10 +120,6 @@ ChatBot &ChatBot::operator=(ChatBot &&source) {
   this->_rootNode = source._rootNode;
   this->_chatLogic = source._chatLogic;
   this->_chatLogic->SetChatbotHandle(this);
-
-  // Remove owned values from source
-  source._image = NULL;
-
   return *this;
 }
 
